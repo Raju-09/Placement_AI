@@ -109,7 +109,7 @@ else:
     :root {
         --background: #F9FAFB;
         --sidebar-background: #FFFFFF;
-        --card-background: #F3F4F6;
+        --card-background: #FFFFFF;
         --text-color: #111827;
         --text-secondary: #4B5563;
         --primary: #2563EB;
@@ -159,18 +159,44 @@ st.markdown(f"""
         font-family: 'Inter', sans-serif !important;
     }}
     
-    /* Input Widgets - Sliders */
-    .stSlider [data-testid="stWidgetLabel"] p {{
-        font-weight: 600 !important;
+    /* Strict override for radio label colors (fix low-contrast white labels) */
+    div[data-testid="stRadio"] label p, div[data-testid="stRadio"] p, div[data-testid="stRadio"] span {{
+        color: var(--text-color) !important;
         font-size: 1rem !important;
+        font-weight: 600 !important;
     }}
     
-    /* Dataframe and Table styling */
-    [data-testid="stTable"], .stDataFrame, [data-testid="stTable"] table {{
+    /* Slider active styles */
+    .stSlider [data-testid="stWidgetLabel"] p {{
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+    }}
+    .stSlider [data-baseweb="slider"] > div {{
+        background-color: var(--primary) !important;
+    }}
+    .stSlider [data-baseweb="slider"] [role="slider"] {{
+        background-color: var(--primary) !important;
+        border-color: var(--primary) !important;
+    }}
+    
+    /* BaseWeb Selectbox / Dropdown fixes */
+    div[data-baseweb="select"] > div {{
+        background-color: var(--background) !important;
+        color: var(--text-color) !important;
         border: 1px solid var(--border) !important;
-        border-radius: 0.75rem !important;
+    }}
+    div[data-baseweb="select"] span {{
+        color: var(--text-color) !important;
+    }}
+    
+    /* Style Native st.container borders into beautiful dashboard cards */
+    div[data-testid="stVerticalBlockBorderWrapper"] {{
         background-color: var(--card-background) !important;
-        overflow: hidden;
+        border: 1px solid var(--border) !important;
+        border-radius: 1.25rem !important;
+        padding: 2rem !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02) !important;
+        margin-bottom: 1.5rem !important;
     }}
     
     /* Hero Header Banner */
@@ -233,16 +259,6 @@ st.markdown(f"""
         align-items: center;
         gap: 0.35rem;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-    }}
-    
-    /* Card Container styles */
-    .dashboard-card {{
-        background-color: var(--card-background);
-        border: 1px solid var(--border);
-        border-radius: 1rem;
-        padding: 1.75rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     }}
     
     /* Consensus Prediction CSS */
@@ -400,20 +416,19 @@ if page == "🎯 Prediction":
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-        st.subheader("📝 Enter Your Profile")
-        
-        cgpa = st.slider("CGPA", 5.5, 10.0, 7.5, 0.1)
-        dsa_score = st.slider("DSA Score (0-100)", 0, 100, 60, 1)
-        aptitude = st.slider("Aptitude Score (0-100)", 0, 100, 70, 1)
-        communication = st.slider("Communication Skills (0-10)", 0.0, 10.0, 6.0, 0.1)
-        attendance = st.slider("Attendance (%)", 0, 100, 85, 1)
-        internships = st.slider("Internship Count", 0, 3, 1, 1)
-        projects = st.slider("Project Count", 0, 5, 2, 1)
-        hackathons = st.slider("Hackathon Participations", 0, 3, 0, 1)
-        certifications = st.slider("Certifications", 0, 3, 1, 1)
-        backlogs = st.slider("Backlogs", 0, 10, 0, 1)
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.subheader("📝 Enter Your Profile")
+            
+            cgpa = st.slider("CGPA", 5.5, 10.0, 7.5, 0.1)
+            dsa_score = st.slider("DSA Score (0-100)", 0, 100, 60, 1)
+            aptitude = st.slider("Aptitude Score (0-100)", 0, 100, 70, 1)
+            communication = st.slider("Communication Skills (0-10)", 0.0, 10.0, 6.0, 0.1)
+            attendance = st.slider("Attendance (%)", 0, 100, 85, 1)
+            internships = st.slider("Internship Count", 0, 3, 1, 1)
+            projects = st.slider("Project Count", 0, 5, 2, 1)
+            hackathons = st.slider("Hackathon Participations", 0, 3, 0, 1)
+            certifications = st.slider("Certifications", 0, 3, 1, 1)
+            backlogs = st.slider("Backlogs", 0, 10, 0, 1)
     
     # Prepare input data
     input_data = np.array([[
@@ -428,57 +443,74 @@ if page == "🎯 Prediction":
         input_data_scaled = input_data
     
     with col2:
-        st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-        st.subheader("🔮 Predictions & Confidence")
-        
-        # Make predictions
-        predictions = {}
-        probabilities = {}
-        
-        for model_name, model in models.items():
-            pred = model.predict(input_data_scaled)[0]
-            predictions[model_name] = pred
+        with st.container(border=True):
+            st.subheader("🔮 Predictions & Confidence")
             
-            if hasattr(model, 'predict_proba'):
-                proba = model.predict_proba(input_data_scaled)[0]
-                probabilities[model_name] = proba[1]
+            # Make predictions
+            predictions = {}
+            probabilities = {}
+            
+            for model_name, model in models.items():
+                pred = model.predict(input_data_scaled)[0]
+                predictions[model_name] = pred
+                
+                if hasattr(model, 'predict_proba'):
+                    proba = model.predict_proba(input_data_scaled)[0]
+                    probabilities[model_name] = proba[1]
+                else:
+                    probabilities[model_name] = None
+            
+            # Custom styled HTML Predictions Table
+            pred_html = f"""
+            <table style="width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 1.5rem; color: var(--text-color); font-family: 'Inter', sans-serif;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                        <th style="padding: 0.75rem 1rem; font-weight: 700; font-family: 'Outfit'; font-size: 0.95rem;">Model Name</th>
+                        <th style="padding: 0.75rem 1rem; font-weight: 700; font-family: 'Outfit'; font-size: 0.95rem;">Result Status</th>
+                        <th style="padding: 0.75rem 1rem; font-weight: 700; font-family: 'Outfit'; font-size: 0.95rem; text-align: right;">Placement Probability</th>
+                    </tr>
+                </thead>
+                <tbody>
+            """
+            for model_name, model in models.items():
+                pred = predictions[model_name]
+                status_text = "✅ PLACED" if pred == 1 else "❌ UNPLACED"
+                status_color = "var(--success)" if pred == 1 else "var(--error)"
+                prob_text = f"{probabilities[model_name]*100:.1f}%" if probabilities[model_name] is not None else "N/A"
+                
+                pred_html += f"""
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 0.75rem 1rem; font-weight: 600; font-size: 0.9rem;">{model_name}</td>
+                        <td style="padding: 0.75rem 1rem; font-weight: 700; font-size: 0.9rem; color: {status_color};">{status_text}</td>
+                        <td style="padding: 0.75rem 1rem; font-weight: 800; font-size: 0.9rem; text-align: right; color: var(--primary);">{prob_text}</td>
+                    </tr>
+                """
+            pred_html += "</tbody></table>"
+            st.markdown(pred_html, unsafe_allow_html=True)
+            
+            # Consensus prediction
+            avg_prob = np.mean([p for p in probabilities.values() if p is not None])
+            
+            if avg_prob > 0.6:
+                consensus_class = "consensus-success"
+                consensus_title = "✅ STRONG CANDIDATE Profile"
+                consensus_desc = "Excellent metrics! The ensemble consensus predicts a very high likelihood of successful placement. Keep up the high standard!"
+            elif avg_prob > 0.4:
+                consensus_class = "consensus-warning"
+                consensus_title = "⚠️ AT-RISK Profile (Borderline)"
+                consensus_desc = "You have a solid foundation, but there is noticeable risk. Focus on targeting the critical improvement areas identified below."
             else:
-                probabilities[model_name] = None
-        
-        # Display predictions table
-        pred_df = pd.DataFrame({
-            'Model Name': list(models.keys()),
-            'Result Status': ["✅ PLACED" if predictions[m] == 1 else "❌ UNPLACED" for m in models.keys()],
-            'Placement Probability': [f"{probabilities[m]*100:.1f}%" if probabilities[m] is not None else "N/A" 
-                                     for m in models.keys()]
-        })
-        
-        st.dataframe(pred_df, use_container_width=True)
-        
-        # Consensus prediction
-        avg_prob = np.mean([p for p in probabilities.values() if p is not None])
-        
-        if avg_prob > 0.6:
-            consensus_class = "consensus-success"
-            consensus_title = "✅ STRONG CANDIDATE Profile"
-            consensus_desc = "Excellent metrics! The ensemble consensus predicts a very high likelihood of successful placement. Keep up the high standard!"
-        elif avg_prob > 0.4:
-            consensus_class = "consensus-warning"
-            consensus_title = "⚠️ AT-RISK Profile (Borderline)"
-            consensus_desc = "You have a solid foundation, but there is noticeable risk. Focus on targeting the critical improvement areas identified below."
-        else:
-            consensus_class = "consensus-danger"
-            consensus_title = "❌ CRITICAL RISK Profile"
-            consensus_desc = "Significant risk identified. Important metrics in core engineering features fall below typical placement thresholds."
+                consensus_class = "consensus-danger"
+                consensus_title = "❌ CRITICAL RISK Profile"
+                consensus_desc = "Significant risk identified. Important metrics in core engineering features fall below typical placement thresholds."
 
-        st.markdown(f"""
-        <div class="consensus-card {consensus_class}">
-            <h3 style="margin-top: 0; font-weight: 700; color: var(--text-color);">{consensus_title}</h3>
-            <p style="font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Average Placement Probability: <span style="font-size: 1.45rem; color: var(--primary); font-weight: 800;">{avg_prob*100:.1f}%</span></p>
-            <p style="margin: 0; color: var(--text-secondary); font-size: 0.95rem;">{consensus_desc}</p>
-        </div>
-        """, unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown(f"""
+            <div class="consensus-card {consensus_class}">
+                <h3 style="margin-top: 0; font-weight: 700; color: var(--text-color);">{consensus_title}</h3>
+                <p style="font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Average Placement Probability: <span style="font-size: 1.45rem; color: var(--primary); font-weight: 800;">{avg_prob*100:.1f}%</span></p>
+                <p style="margin: 0; color: var(--text-secondary); font-size: 0.95rem;">{consensus_desc}</p>
+            </div>
+            """, unsafe_allow_html=True)
     
     # Risk Analysis
     st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
