@@ -174,12 +174,14 @@ st.markdown(f"""
     }}
     
     /* Style Native st.container borders into beautiful cards */
-    div[data-testid="stVerticalBlockBorderWrapper"] {{
+    /* Compatible with all Streamlit versions (border=True removed for cross-version support) */
+    div[data-testid="stVerticalBlockBorderWrapper"],
+    div[data-testid="stVerticalBlock"] > div[data-testid="stVerticalBlock"] {{
         background-color: var(--card-background) !important;
         border: 1px solid var(--border) !important;
         border-radius: 1.25rem !important;
-        padding: 2rem !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02) !important;
+        padding: 1.5rem !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
         margin-bottom: 1.5rem !important;
     }}
     
@@ -400,7 +402,7 @@ if page == "🎯 Prediction":
     col1, col2 = st.columns(2)
     
     with col1:
-        with st.container(border=True):
+        with st.container():
             st.subheader("📝 Enter Your Profile")
             
             cgpa = st.slider("CGPA", 5.5, 10.0, 7.5, 0.1)
@@ -427,7 +429,7 @@ if page == "🎯 Prediction":
         input_data_scaled = input_data
     
     with col2:
-        with st.container(border=True):
+        with st.container():
             st.subheader("🔮 Predictions & Confidence")
             
             # Make predictions
