@@ -4,6 +4,10 @@
 import sys
 import os
 
+# Ensure UTF-8 output on Windows console
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
 # Test 1: Check Python
 print("✅ Python version:", sys.version.split()[0])
 

@@ -12,6 +12,10 @@ from pathlib import Path
 os.chdir(Path(__file__).parent)
 sys.path.insert(0, str(Path(__file__).parent))
 
+# Ensure UTF-8 output on Windows console
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
 print("\n" + "="*80)
 print(" "*20 + "🎓 PLACEMENT AI - EXECUTING PIPELINE")
 print("="*80)

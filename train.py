@@ -7,6 +7,10 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Ensure UTF-8 output on Windows console
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
 def run_pipeline():
     """Execute complete ML pipeline"""
     

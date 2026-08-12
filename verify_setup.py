@@ -3,7 +3,12 @@ Verification script - Check if all files are created correctly
 """
 
 import os
+import sys
 from pathlib import Path
+
+# Ensure UTF-8 output on Windows console
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
 def verify_setup():
     """Verify all project files are created"""
